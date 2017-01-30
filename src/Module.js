@@ -7,6 +7,7 @@ import { basename, extname } from './utils/path.js';
 import makeLegalIdentifier from './utils/makeLegalIdentifier.js';
 import getCodeFrame from './utils/getCodeFrame.js';
 import { SOURCEMAPPING_URL_RE } from './utils/sourceMappingURL.js';
+import { ANNOTATION_RE } from './utils/annotation.js';
 import error from './utils/error.js';
 import relativeId from './utils/relativeId.js';
 import { SyntheticNamespaceDeclaration } from './Declaration.js';
@@ -88,6 +89,21 @@ export default class Module {
 				this.magicString.remove(comment.start, comment.end );
 			}
 			return !isSourceMapComment;
+		});
+
+		this.annotations = this.comments.filter(comment => {
+			const match = ANNOTATION_RE.exec(comment.text);
+
+			if ( match ) {
+				comment.isAnnotation = true;
+				comment.annotation = match[1];
+
+				if ( comment.start === 0 && comment.annotation === 'pure' ) {
+					this.pure = true;
+				}
+			}
+
+			return !!match;
 		});
 
 		this.declarations = blank();

@@ -14,6 +14,7 @@ export default function isUsedByBundle ( scope, node ) {
 	}
 
 	if ( declaration.activated ) return true;
+	if ( scope.module.pure ) return false;
 
 	const values = new Set();
 	declaration.gatherPossibleValues( values );
